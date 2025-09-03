@@ -1,5 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -9,4 +7,90 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// ENUMS 
+
+enum Level {
+  A1
+  A2
+  B1
+  B2
+  C1
+}
+
+enum Type {
+  DEVELOPER
+}
+
+enum ErrorSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+
+// MODELS
+
+model User {
+  id      String      @id @default(cuid())
+  email   String   @unique
+  name    String?
+  profile Profile?
+  createdAt DateTime  @default(now())
+}
+
+model Profile {
+  id     String  @id @default(cuid())
+  userId String     @unique
+  level Level
+  type  Type
+  createdAt   DateTime     @default(now())
+  submissions Submission[]
+
+  user   User    @relation(fields: [userId], references: [id])
+}
+
+model Submission {
+  id          String        @id @default(cuid())
+  userId      String
+  subject     String
+  body        String
+  errors      Error[]
+  score       Int?
+  feedback    Feedback[]          // Pontuação geral de proficiência
+  createdAt   DateTime      @default(now())
+
+  profile        Profile          @relation(fields: [userId], references: [id])
+}
+
+
+model Exercise {
+  id        String        @id @default(cuid())
+  type      String        // Ex: "rewrite", "multiple_choice", "fill_blank"
+  subject     String
+  body        String 
+  prompt    String  
+
+  Error Error[]
+}
+
+model Error {
+  id           String        @id @default(cuid())
+  submissionId String
+  exerciseId   String?       // Opcional, para associar ao exercício gerado
+  message      String
+  tags         String[]
+  severity     ErrorSeverity
+  
+  submission   Submission @relation(fields: [submissionId], references: [id])
+  exercise     Exercise?  @relation(fields: [exerciseId], references: [id])
+}
+
+model Feedback {
+  id          String        @id @default(cuid())
+  submissionId String
+  message     String        // Observação detalhada
+  sumary      String        // Resumo breve
+  submission  Submission @relation(fields: [submissionId], references: [id])
 }
