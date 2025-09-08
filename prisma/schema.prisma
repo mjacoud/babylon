@@ -56,10 +56,9 @@ model Submission {
   userId      String
   subject     String
   body        String
-  errors      Error[]
-  score       Int?
-  feedback    Feedback[]          // Pontuação geral de proficiência
   createdAt   DateTime      @default(now())
+  errors      Error[]
+  feedbacks   Feedback[]
 
   profile        Profile          @relation(fields: [userId], references: [id])
 }
@@ -68,11 +67,11 @@ model Submission {
 model Exercise {
   id        String        @id @default(cuid())
   type      String        // Ex: "rewrite", "multiple_choice", "fill_blank"
+  to        String
+  cc      String[]
   subject     String
   body        String 
-  prompt    String  
-
-  Error Error[]
+  prompt    String 
 }
 
 model Error {
@@ -82,9 +81,8 @@ model Error {
   message      String
   tags         String[]
   severity     ErrorSeverity
-  
-  submission   Submission @relation(fields: [submissionId], references: [id])
-  exercise     Exercise?  @relation(fields: [exerciseId], references: [id])
+
+  Submission Submission @relation(fields: [submissionId], references: [id])
 }
 
 model Feedback {
@@ -92,5 +90,7 @@ model Feedback {
   submissionId String
   message     String        // Observação detalhada
   sumary      String        // Resumo breve
-  submission  Submission @relation(fields: [submissionId], references: [id])
+  createdAt   DateTime      @default(now())
+
+  submission    Submission  @relation(fields: [submissionId], references: [id])
 }
