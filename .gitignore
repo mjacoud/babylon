@@ -24,6 +24,7 @@
 .DS_Store
 *.pem
 todo.txt
+prompt.txts
 
 # debug
 npm-debug.log*
