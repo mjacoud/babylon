@@ -52,6 +52,7 @@ export async function POST(request: Request) {
             contents: prompt
 
         });
+        
 
         return new Response(response.text, { status: 200 })
     } catch (error) {
